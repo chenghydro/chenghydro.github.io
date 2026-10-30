@@ -1,0 +1,114 @@
+
+
+
+
+var loadMashlet = function(cb) {
+
+    var requireScript = function(url, callback) {
+        var scripts = document.getElementsByTagName('script');
+        var found = false;
+
+        if (scripts) {
+            for (var i = 0; i < scripts.length; i++) {
+                if (scripts[i].src === url) {
+                    found = true;
+                }
+            }
+        }
+
+        if (!found) {
+            var script = document.createElement('script');
+            script.setAttribute('type', 'text/javascript');
+            if (callback) {
+                    script.onreadystatechange = function(response) {
+                    if (this.readyState == "loaded"||this.readyState== "complete") {
+                        callback.onSuccess();
+                    }
+                };
+                script.onload =function(response){
+                    callback.onSuccess();
+                }
+            }
+            var head = document.getElementsByTagName('head')[0];
+            var insert = head.appendChild(script);
+            script.src = url;
+        } else {
+            if (callback) {
+                callback.onSuccess();
+            }
+        }
+    };
+
+
+    var parameters = {};
+    
+            parameters['showTitle'] = 'false';
+    
+            parameters['className'] = 'a';
+    
+            parameters['rid'] = 'G-3471-2013';
+    
+
+    requireScript('http://labs.researcherid.com:80/static/mashlet/js/mashlet-loader.js');
+    var intervalId = setInterval(function() {
+
+        if(window.Ema) {
+            clearInterval(intervalId);
+
+            var el = document.getElementById("badgeCont803677");
+            if(!el) {
+                var sampleEle = document.createElement('div');
+                var callingScriptUrl =  'http://labs.researcherid.com/mashlets/?el=badgeCont803677&mashlet=badge&showTitle=false&className=a&rid=G-3471-2013';
+                
+                var allScripts = document.getElementsByTagName('script');
+                for(var i=0;i<allScripts.length;i++){
+                    if (allScripts[i].src == callingScriptUrl){
+                        allScripts[i].parentNode.insertBefore(sampleEle,allScripts[i].nextSibling);
+                        allScripts[i].parentNode.removeChild(allScripts[i]);
+                        break;
+                    }
+                }
+                if(i==allScripts.length){
+                    document.body.appendChild(sampleEle);
+                }
+                
+                el = sampleEle;
+            }
+
+            Ema.load({
+                serverUrl: 'http://labs.researcherid.com:80',
+                resourcesBase: 'http://labs.researcherid.com:80/static',
+                el: el,
+                name: 'badge',
+                callback: {
+                    onSuccess: function() {
+                    },
+                    onFailure: function(error) {
+                        console.log(error);
+                         el.innerHTML = 'Could not load Mashlet - ' + 'badge. '+ (error && error.message ? error.message : '');
+
+                    },
+                    scope: this
+                },
+                args: parameters
+            });
+
+
+        }
+    }, 100);
+};
+
+
+
+
+
+if (document.attachEvent){
+    document.attachEvent('onreadystatechange',loadMashlet);
+} else{
+
+    window.addEventListener('load',loadMashlet,true);
+//    loadMashlet();
+}
+
+
+
